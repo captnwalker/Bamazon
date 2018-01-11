@@ -1,0 +1,28 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "Amazon-like CLI storefront built with mySQL, NODE.js and Inquirer",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/captnwalker/Bamazon.git"
+  },
+  "keywords": [
+    "mysql",
+    "nodejs",
+    "cli",
+    "inquirer"
+  ],
+  "author": "Steve Walker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/captnwalker/Bamazon/issues"
+  },
+  "homepage": "https://github.com/captnwalker/Bamazon#readme",
+  "dependencies": {
+    "mysql": "^2.15.0"
+  }
+}
