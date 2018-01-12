@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/captnwalker/Bamazon#readme",
   "dependencies": {
+    "console.table": "^0.9.1",
     "inquirer": "^5.0.0",
     "mysql": "^2.15.0",
     "node": "^9.4.0"
