@@ -1,6 +1,8 @@
 // Required Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var colors = require('colors');
+require('console.table');
 
 // Connection script
 var connection = mysql.createConnection({
@@ -11,7 +13,7 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Credentials
-  password: "pebbles1",
+  password: "*****",
   database: "bamazon"
 });
 
