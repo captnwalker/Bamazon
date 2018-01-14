@@ -1,9 +1,7 @@
 // Required Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var prompt = require('prompt');
 var colors = require('colors');
-require('console.table');
 var Table = require('cli-table');
 
 // Connection script
@@ -33,7 +31,7 @@ function bamazon() {
     connection.query('SELECT * FROM products', function (err, res) {
         if (err) throw err;
 
-        // Cli-Table display code with color
+        // Cli-Table display code with Color
         var table = new Table(
             {
                 head: ["Product ID".cyan.bold, "Product Name".cyan.bold, "Department Name".cyan.bold, "Price".cyan.bold, "Quantity".cyan.bold],
@@ -64,6 +62,7 @@ function bamazon() {
             },
         ])
 
+            // Ordering function
             .then(function (order) {
 
                 var quantity = order.quantity;

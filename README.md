@@ -1,12 +1,12 @@
 # Bamazon
 
->An Amazon-like CLI storefront built with mySQL, NODE.js and Inquirer NPM. The app can take in orders from customers and deplete stock from the store's inventory.
+>An Amazon-like CLI storefront built with mySQL, NODE.js and Inquirer NPM. Output styled with NPM's Colors and console.table. The app can take in orders from customers, calculate sales price and deplete stock from the store's inventory.
 
 ### Deployment
 
 1. Clone repo
 2. Run `npm install`
-3. Build database from `schema.sql`
+3. Build database from `schema.sql` and `seeds.sql`
 4. At command prompt run `node bamazonCustomers.js`
 
 ### Screenshot of this Project
@@ -15,12 +15,12 @@
 
 ### Technologies Utilized
 
+* mySQL
 * NodeJS
 * JavaScript
-* mySQL
 * NPM Inquirer
 * NPM console.table
-* NPM Chalk
+* NPM Colors
 
 ---
 

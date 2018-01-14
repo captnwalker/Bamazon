@@ -14,7 +14,8 @@
     "mysql",
     "nodejs",
     "cli",
-    "inquirer"
+    "inquirer",
+    "bamazon"
   ],
   "author": "Steve Walker",
   "license": "ISC",
@@ -25,11 +26,9 @@
   "dependencies": {
     "cli-table": "^0.3.1",
     "colors": "^1.1.2",
-    "console.table": "^0.9.1",
     "inquirer": "^5.0.0",
     "mysql": "^2.15.0",
-    "node": "^9.4.0",
-    "prompt": "^1.0.0"
+    "node": "^9.4.0"
   },
   "devDependencies": {}
 }
