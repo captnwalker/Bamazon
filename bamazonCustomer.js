@@ -1,6 +1,7 @@
 // Required Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var prompt = require('prompt');
 var colors = require('colors');
 require('console.table');
 var Table = require('cli-table');
@@ -21,9 +22,11 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
-    connection.end();
-});
-// End Connection Script
+    //connection.end();
+    
+    bamazon();      //Call main function
+
+});     // End Connection Script
 
 //BEGIN Display Inventory
 function bamazon() {
@@ -33,7 +36,7 @@ function bamazon() {
         // Cli-Table display code with color
         var table = new Table(
             {
-                head: ["Product ID".red.bgYellow.bold, "Product Name".blue, "Department Name".blue, "Price".blue, "Quantity".blue],
+                head: ["Product ID".red.bgYellow.bold, "Product Name".blue, "Department Name".blue, "price".blue, "Quantity".blue],
                 colWidths: [12, 75, 20, 12, 12],
             });
 
@@ -47,102 +50,53 @@ function bamazon() {
 //END Display Inventory
         
 
-        // Prompt Buyers Input
+        //Prompt Buyers Input
         inquirer.prompt([
             {
                 type: "number",
-                message: "Which item would you like to purchase? (Please enter the Product ID)",
+                message: "Which item would you like to buy? (Please enter the Product ID)",
                 name: "id"
             },
             {
                 type: "number",
                 message: "How many would you like to buy?",
-                name: "howMany"
+                name: "quantity"
             },
-        ]).then(function (user) {
+        ])
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            process.on('unhandledRejection', (reason, p) => {
-                console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
-                // application specific logging, throwing an error, or other logic here
-              });
+.then(function (order) {
+    // If we log that order as a JSON, we can see how it looks.
+    //console.log(JSON.stringify(order, null, 2));
+          var quantity = order.quantity;
+          var itemId = order.id;
+          connection.query('SELECT * FROM products WHERE id=' + itemId, function(err, selectedItem) {
+              if (err) throw err;
+               if (selectedItem[0].stock_quantity - quantity >= 0) {
+                    console.log("Bamazon's Inventory has enough of that item (".green + selectedItem[0].product_name.green + ")!".green);
+                    console.log("Quantity in Stock: ".green + selectedItem[0].stock_quantity + " Order Quantity: ".green + quantity);
+                    console.log("You will be charged ".green + (order.quantity * selectedItem[0].Price) +  " dollars.  Thank you for shopping at Bamazon.".green);
 
-            connection.query('SELECT * FROM products WHERE id =' + id,function(err, res) {
-                if (err) throw err;
 
-                if (res[user.id - 1].stock_quantity > user.howMany) {
-                    var newQuantity = parseInt(res[user.id - 1].stock_quantity) - parseInt(user.howMany);
-                    var total = parseFloat(user.howMany) * parseFloat(res[user.id - 1].Price);
-                    total = total.toFixed(2);
+                    //  This is the code to remove the item from inventory.
+                    // Some code from the mysql NPM readme: connection.query('UPDATE users SET foo = ?, bar = ?, baz = ? WHERE id = ?', ['a', 'b', 'c', userId], function(err, results) {});
+                    connection.query('UPDATE products SET stock_quantity=? WHERE id=?', [selectedItem[0].stock_quantity - quantity, itemId],
+                    function(err, inventory) {
+                        if (err) throw err;
+                         // Runs the prompt again, so the user can keep shopping.
+                         bamazon();
+                    });  // Ends the code to remove item from inventory.
+                    
 
-                    var departmentTotal = parseFloat(total) + parseFloat(res[user.id - 1].TotalSales);
-                    departmentTotal = departmentTotal.toFixed(2);
+               }
 
-                    connection.query("UPDATE departments SET ? WHERE ?", [{
-                        TotalSales: departmentTotal
-                    }, {
-                        department_name: res[user.id - 1].department_name
-                    }], function (error, results) { });
-
-                    connection.query("UPDATE products SET ? WHERE ?", [{
-                        stock_quantity: newQuantity
-                    }, {
-                        itemID: user.id
-                    }], function (error, results) {
-                        if (error) throw error;
-
-                        console.log("Your order for " + user.howMany + " " + res[user.id - 1].product_name +
-                            "(s) has been placed.");
-                        console.log("Your total is $" + total);
-                        orderMore();
-                    });
-
-                } else {
-                    console.log("We're sorry, we only have " + res[user.id - 1].stock_quantity + " of that product.");
-                    orderMore();
-                }
-            });
-        });
-    });
+               else {
+                    console.log("Insufficient quantity.  Please order less of that item, as Bamazon only has ".red + selectedItem[0].stock_quantity + " " + selectedItem[0].product_name.red + " in stock at this moment.".red);
+                    bamazon();
+                    
+                    
+               }
+          });
+});
+});
 }
-
-function orderMore() {
-    inquirer.prompt([
-        {
-            type: "confirm",
-            message: "Would you like to order anything else?",
-            name: "again"
-        },
-    ]).then(function (user) {
-        if (user.again) {
-            selection();
-        } else {
-            exit();
-        }
-    });
-}
-
-function exit() {
-    connection.end();
-    console.log("Have a great day!");
-}
-
-bamazon();
-
-
-
-
-// inquirer.prompt([
-
-//     // Here we create a basic text prompt.
-//     {
-//         type: "input",
-//         message: "What is the item you would like to buy?",
-//         name: "id"
-//     },
-
-//      {
-//         type: "input",
-//         message: "How many would you like to buy?",
-//         name: "quantity"
-//     }
-// ])
