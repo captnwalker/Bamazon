@@ -6,8 +6,8 @@
 
 1. Clone repo
 2. Run `npm install`
-3. Build database from `bamazon.sql`
-4. At command prompt run `node bamazon.js`
+3. Build database from `schema.sql`
+4. At command prompt run `node bamazonCustomers.js`
 
 ### Screenshot of this Project
 

@@ -15,20 +15,20 @@ var connection = mysql.createConnection({
     user: "root",
 
     // Credentials
-    password: "pebbles1",
+    password: "*******",
     database: "bamazon"
 });
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId);
+    console.log(colors.cyan("...you are now connected to the bamazon database as id " + connection.threadId));
     //connection.end();
-    
+
     bamazon();      //Call main function
 
-});     // End Connection Script
+});                 // End Connection Script
 
-//BEGIN Display Inventory
+// BEGIN Display Inventory
 function bamazon() {
     connection.query('SELECT * FROM products', function (err, res) {
         if (err) throw err;
@@ -36,10 +36,11 @@ function bamazon() {
         // Cli-Table display code with color
         var table = new Table(
             {
-                head: ["Product ID".blue.bgYellow.bold, "Product Name".cyan, "Department Name".cyan, "price".cyan, "Quantity".cyan],
+                head: ["Product ID".cyan.bold, "Product Name".cyan.bold, "Department Name".cyan.bold, "Price".cyan.bold, "Quantity".cyan.bold],
                 colWidths: [12, 75, 20, 12, 12],
             });
 
+        // Set/Style table headings and Loop through entire inventory
         for (var i = 0; i < res.length; i++) {
             table.push(
                 [res[i].id, res[i].product_name, res[i].department_name, parseFloat(res[i].price).toFixed(2), res[i].stock_quantity]
@@ -47,10 +48,9 @@ function bamazon() {
         }
 
         console.log(table.toString());
-//END Display Inventory
-        
+        //END Display Inventory
 
-        //Prompt Buyers Input
+        //Prompt Customers Input
         inquirer.prompt([
             {
                 type: "number",
@@ -63,40 +63,42 @@ function bamazon() {
                 name: "quantity"
             },
         ])
-///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-.then(function (order) {
-    // If we log that order as a JSON, we can see how it looks.
-    //console.log(JSON.stringify(order, null, 2));
-          var quantity = order.quantity;
-          var itemId = order.id;
-          connection.query('SELECT * FROM products WHERE id=' + itemId, function(err, selectedItem) {
-              if (err) throw err;
-               if (selectedItem[0].stock_quantity - quantity >= 0) {
-                    console.log("Bamazon's Inventory has enough of that item (".green + selectedItem[0].product_name.green + ")!".green);
-                    console.log("Quantity in Stock: ".green + selectedItem[0].stock_quantity + " Order Quantity: ".green + quantity);
-                    console.log("You will be charged ".green + (order.quantity * selectedItem[0].price).toFixed(2) +  " dollars.  Thank you for shopping at Bamazon.".green);
+            .then(function (order) {
 
+                var quantity = order.quantity;
+                var itemId = order.id;
 
-                    //  This is the code to remove the item from inventory.
-                    // Some code from the mysql NPM readme: connection.query('UPDATE users SET foo = ?, bar = ?, baz = ? WHERE id = ?', ['a', 'b', 'c', userId], function(err, results) {});
-                    connection.query('UPDATE products SET stock_quantity=? WHERE id=?', [selectedItem[0].stock_quantity - quantity, itemId],
-                    function(err, inventory) {
-                        if (err) throw err;
-                         // Runs the prompt again, so the user can keep shopping.
-                         bamazon();
-                    });  // Ends the code to remove item from inventory.
-                    
+                connection.query('SELECT * FROM products WHERE id=' + itemId, function (err, selectedItem) {
+                    if (err) throw err;
 
-               }
+                    // Varify item quantity desired is in inventory
+                    if (selectedItem[0].stock_quantity - quantity >= 0) {
+                        console.log("Bamazon's Inventory has enough of that item (".green + selectedItem[0].product_name.yellow + ")!".green);
 
-               else {
-                    console.log("Insufficient quantity.  Please order less of that item, as Bamazon only has ".red + selectedItem[0].stock_quantity + " " + selectedItem[0].product_name.red + " in stock at this moment. Please make another selection or reduce your quantity.".red);
-                    bamazon();
-                    
-                    
-               }
-          });
-});
-});
-}
+                        console.log("Quantity in Stock: ".green + selectedItem[0].stock_quantity + " Order Quantity: ".green + quantity.yellow);
+
+                        // Calculate total sale, and fix 2 decimal places
+                        console.log("You will be charged ".green + (order.quantity * selectedItem[0].price).toFixed(2).yellow + " dollars.".green, "Thank you for shopping at Bamazon!".magenta);
+
+                        // Query to remove the purchased item from inventory.                       
+                        connection.query('UPDATE products SET stock_quantity=? WHERE id=?', [selectedItem[0].stock_quantity - quantity, itemId],
+
+                            function (err, inventory) {
+                                if (err) throw err;
+
+                                bamazon();  // Runs the prompt again, so the customer can continue shopping.
+                            });  // Ends the code to remove item from inventory.
+
+                    }
+                    // Low inventory warning
+                    else {
+                        console.log("Insufficient quantity. As Bamazon only has ".red + selectedItem[0].stock_quantity + " " + selectedItem[0].product_name.cyan + " in stock at this moment. \nPlease make another selection or reduce your quantity.".red);
+
+                        bamazon();  // Runs the prompt again, so the customer can continue shopping.
+                    }
+                });
+            });
+    });
+}   // Closes bamazon function
+
