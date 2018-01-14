@@ -36,7 +36,7 @@ function bamazon() {
         // Cli-Table display code with color
         var table = new Table(
             {
-                head: ["Product ID".red.bgYellow.bold, "Product Name".blue, "Department Name".blue, "price".blue, "Quantity".blue],
+                head: ["Product ID".blue.bgYellow.bold, "Product Name".cyan, "Department Name".cyan, "price".cyan, "Quantity".cyan],
                 colWidths: [12, 75, 20, 12, 12],
             });
 
@@ -54,12 +54,12 @@ function bamazon() {
         inquirer.prompt([
             {
                 type: "number",
-                message: "Which item would you like to buy? (Please enter the Product ID)",
+                message: "Which item would you like to buy? (Please enter the Product ID)".yellow,
                 name: "id"
             },
             {
                 type: "number",
-                message: "How many would you like to buy?",
+                message: "How many would you like to buy?".yellow,
                 name: "quantity"
             },
         ])
@@ -75,7 +75,7 @@ function bamazon() {
                if (selectedItem[0].stock_quantity - quantity >= 0) {
                     console.log("Bamazon's Inventory has enough of that item (".green + selectedItem[0].product_name.green + ")!".green);
                     console.log("Quantity in Stock: ".green + selectedItem[0].stock_quantity + " Order Quantity: ".green + quantity);
-                    console.log("You will be charged ".green + (order.quantity * selectedItem[0].Price) +  " dollars.  Thank you for shopping at Bamazon.".green);
+                    console.log("You will be charged ".green + (order.quantity * selectedItem[0].price).toFixed(2) +  " dollars.  Thank you for shopping at Bamazon.".green);
 
 
                     //  This is the code to remove the item from inventory.
@@ -91,7 +91,7 @@ function bamazon() {
                }
 
                else {
-                    console.log("Insufficient quantity.  Please order less of that item, as Bamazon only has ".red + selectedItem[0].stock_quantity + " " + selectedItem[0].product_name.red + " in stock at this moment.".red);
+                    console.log("Insufficient quantity.  Please order less of that item, as Bamazon only has ".red + selectedItem[0].stock_quantity + " " + selectedItem[0].product_name.red + " in stock at this moment. Please make another selection or reduce your quantity.".red);
                     bamazon();
                     
                     
