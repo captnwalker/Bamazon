@@ -1,3 +1,4 @@
+// TEMPLATE FOR EXECUTIVE PAGE (Will produce table output)
 // Required Dependencies
 var mysql = require("mysql");
 var inquirer = require("inquirer");
