@@ -19,7 +19,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log(colors.cyan("...you are now connected to the bamazon database as id " + connection.threadId));
+    console.log(colors.cyan("Welcome! ...you are now connected to the Bamazon Store database as id " + connection.threadId));
     //connection.end();
 
     bamazon();      //Call main function
@@ -46,13 +46,13 @@ function bamazon() {
         }
 
         console.log(table.toString());
-        //END Display Inventory
+        // END Display Inventory
 
-        //Prompt Customers Input
+        // Prompt Customers Input
         inquirer.prompt([
             {
                 type: "number",
-                message: "Which item would you like to buy? (Please enter the Product ID)".yellow,
+                message: "Please enter the Product ID of the item that you would like to buy?".yellow,
                 name: "id"
             },
             {
@@ -63,25 +63,28 @@ function bamazon() {
         ])
 
             // Ordering function
-            .then(function (order) {
+            .then(function (cart) {
 
-                var quantity = order.quantity;
-                var itemId = order.id;
+                var quantity = cart.quantity;
+                var itemID = cart.id;
 
-                connection.query('SELECT * FROM products WHERE id=' + itemId, function (err, selectedItem) {
+                connection.query('SELECT * FROM products WHERE id=' + itemID, function (err, selectedItem) {
                     if (err) throw err;
 
                     // Varify item quantity desired is in inventory
                     if (selectedItem[0].stock_quantity - quantity >= 0) {
-                        console.log("Bamazon's Inventory has enough of that item (".green + selectedItem[0].product_name.yellow + ")!".green);
 
-                        console.log("Quantity in Stock: ".green + selectedItem[0].stock_quantity + " Order Quantity: ".green + quantity.yellow);
+                        console.log("INVENTORY AUDIT: Quantity in Stock: ".green + selectedItem[0].stock_quantity + " Order Quantity: ".green + quantity.yellow);
+
+                        console.log("Congratulations! Bamazon has suffiecient inventory of ".green + selectedItem[0].product_name.yellow + " to fill your order!".green);
+
+                       
 
                         // Calculate total sale, and fix 2 decimal places
-                        console.log("You will be charged ".green + (order.quantity * selectedItem[0].price).toFixed(2).yellow + " dollars.".green, "Thank you for shopping at Bamazon!".magenta);
+                        console.log("Thank You for your purchase. Your order total will be ".green + (cart.quantity * selectedItem[0].price).toFixed(2).yellow + " dollars.".green, "\nThank you for shopping at Bamazon!".magenta);
 
                         // Query to remove the purchased item from inventory.                       
-                        connection.query('UPDATE products SET stock_quantity=? WHERE id=?', [selectedItem[0].stock_quantity - quantity, itemId],
+                        connection.query('UPDATE products SET stock_quantity=? WHERE id=?', [selectedItem[0].stock_quantity - quantity, itemID],
 
                             function (err, inventory) {
                                 if (err) throw err;
@@ -92,7 +95,7 @@ function bamazon() {
                     }
                     // Low inventory warning
                     else {
-                        console.log("Insufficient quantity. As Bamazon only has ".red + selectedItem[0].stock_quantity + " " + selectedItem[0].product_name.cyan + " in stock at this moment. \nPlease make another selection or reduce your quantity.".red);
+                        console.log("INSUFFICIENT INVENTORY ALERT: \nBamazon only has ".red + selectedItem[0].stock_quantity + " " + selectedItem[0].product_name.cyan + " in stock at this moment. \nPlease make another selection or reduce your quantity.".red, "\nThank you for shopping at Bamazon!".magenta);
 
                         bamazon();  // Runs the prompt again, so the customer can continue shopping.
                     }
